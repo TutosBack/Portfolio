@@ -1,0 +1,223 @@
+/* Base container styles */
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 260px;
+  margin: 0 auto;
+  overflow: hidden;
+  user-select: none;
+  touch-action: pan-y;
+  -webkit-user-drag: none;
+}
+
+/* 3D space for the carousel */
+.carousel {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+  transform-style: preserve-3d;
+}
+
+/* Spinner that rotates */
+.carousel-spinner {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+}
+
+/* Individual carousel items */
+.carousel-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 110px;
+  height: 160px;
+  margin: -80px 0 0 -55px;
+  backface-visibility: hidden;
+  transition: transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1),
+              opacity 0.5s ease,
+              scale 0.5s ease;
+  cursor: pointer;
+  transform-style: preserve-3d;
+}
+
+/* Style for the content inside items */
+.carousel-item-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 16px;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #333;
+}
+
+/* Selected item styling */
+.carousel-item.selected .carousel-item-content {
+  box-shadow: 0 8px 24px rgba(59, 130, 246, 0.25);
+  border: 2px solid #3B82F6;
+}
+
+/* Image container */
+.carousel-item-image {
+  width: 100%;
+  height: 60%;
+  margin-bottom: 16px;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+/* Image styling */
+.carousel-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+/* Image hover effect */
+.carousel-item:hover .carousel-item-image img {
+  transform: scale(1.05);
+}
+
+/* Title styling */
+.carousel-item-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  line-height: 1.2;
+}
+
+/* Description styling */
+.carousel-item-description {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.8;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* Controls container */
+.carousel-controls {
+  position: absolute;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 40px;
+  z-index: 10;
+}
+
+/* Individual control buttons */
+.carousel-control {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.9);
+  border: none;
+  border-radius: 24px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-control:hover {
+  background-color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.carousel-control:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+/* Previous control specific styling */
+.carousel-control-prev {
+  padding-left: 12px;
+}
+
+.carousel-control-prev span {
+  margin-left: 8px;
+}
+
+/* Next control specific styling */
+.carousel-control-next {
+  padding-right: 12px;
+}
+
+.carousel-control-next span {
+  margin-right: 8px;
+}
+
+/* Hide controls on mobile */
+@media (max-width: 767px) {
+  .carousel-controls {
+    display: none;
+  }
+  
+  .carousel-container {
+    height: 160px;
+  }
+  
+  .carousel-item {
+    width: 70px;
+    height: 100px;
+    margin: -50px 0 0 -35px;
+  }
+  
+  .carousel-item-title {
+    font-size: 13px;
+  }
+  
+  .carousel-item-description {
+    font-size: 10px;
+    -webkit-line-clamp: 2;
+  }
+}
+
+.carousel-item-image.large {
+  width: 100%;
+  height: 85%;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.carousel-item-image.large img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+.carousel-item-title.light {
+  font-weight: 400;
+  font-size: 1rem;
+  color: #22223b;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.carousel-item.selected .carousel-item-title.light {
+  font-weight: 500;
+  font-size: 1.1rem;
+  color: #fbbf24;
+}
