@@ -10,6 +10,7 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
   isSelected,
   isAnimating,
   onClick,
+  axis = 'y', // Default to Y axis (horizontal rotation)
 }) => {
   // For selected item, always show face-on (rotation 0deg)
   const itemAngle = isSelected ? 0 : rotation;
@@ -22,11 +23,17 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
   // Opacity: selected fully visible, others faded
   const opacity = isSelected ? 1 : 0.5;
 
+  // Calculate transform based on axis
+  const getItemTransform = () => {
+    const rotateAxis = axis === 'y' ? 'rotateY' : 'rotateX';
+    return `${rotateAxis}(${itemAngle}deg) translateZ(${translateZ}px) scale(${scale})`;
+  };
+
   return (
     <div
-      className={`carousel-item${isSelected ? ' selected' : ''}`}
+      className={`carousel-item carousel-item--${axis}${isSelected ? ' selected' : ''}`}
       style={{
-        transform: `rotateY(${itemAngle}deg) translateZ(${translateZ}px) scale(${scale})`,
+        transform: getItemTransform(),
         opacity,
         zIndex,
         transition: isAnimating ? 'transform 0.5s, opacity 0.5s' : undefined,

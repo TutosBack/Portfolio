@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Carousel from './Carousel';
 import { CarouselItem } from './types';
 import { Code2, Database, Cloud, Wrench, Globe, Cpu } from 'lucide-react';
@@ -45,6 +45,23 @@ const getLevelColor = (level: string) => {
 
 const TechStackCarousel: React.FC<TechStackCarouselProps> = ({ items }) => {
   const [selectedItem, setSelectedItem] = useState<CarouselItem | null>(items[0] || null);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  // Handle responsive screen size detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024);
+    };
+
+    // Initial check
+    handleResize();
+    
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+    
+    // Cleanup
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSelectItem = (item: CarouselItem) => {
     setSelectedItem(item);
@@ -63,11 +80,12 @@ const TechStackCarousel: React.FC<TechStackCarouselProps> = ({ items }) => {
         <div className="carousel-section">
           <Carousel 
             items={items}
-            radius={140}
+            radius={isLargeScreen ? 250 : 140}
+            axis={isLargeScreen ? 'x' : 'y'}
             autoRotate={true}
             autoRotateSpeed={4000}
             onSelectItem={handleSelectItem}
-            className="tech-carousel"
+            className={`tech-carousel tech-carousel--${isLargeScreen ? 'vertical' : 'horizontal'}`}
           />
         </div>
         

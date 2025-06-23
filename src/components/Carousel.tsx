@@ -13,9 +13,11 @@ const Carousel: React.FC<CarouselProps> = ({
   visibleCount = 7,
   onSelectItem,
   className = '',
+  axis = 'y', // Default to Y axis (horizontal rotation)
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [containerHeight, setContainerHeight] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   
   const {
@@ -33,13 +35,15 @@ const Carousel: React.FC<CarouselProps> = ({
     initialRotation,
     autoRotate,
     autoRotateSpeed,
+    axis,
   });
 
-  // Check if mobile and update container width
+  // Check if mobile and update container dimensions
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         setContainerWidth(containerRef.current.clientWidth);
+        setContainerHeight(containerRef.current.clientHeight);
         setIsMobile(window.innerWidth < 768);
       }
     };
@@ -56,41 +60,62 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   }, [selectedItemIndex, items, onSelectItem]);
 
-  // Calculate adaptive radius based on container width
-  const adaptiveRadius = containerWidth ? Math.min(radius, containerWidth / 2.5) : radius;
+  // Calculate adaptive radius based on container dimensions
+  const adaptiveRadius = containerWidth && containerHeight 
+    ? Math.min(radius, axis === 'y' ? containerWidth / 2.5 : containerHeight / 2.5) 
+    : radius;
   
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if ((axis === 'y' && e.key === 'ArrowLeft') || (axis === 'x' && e.key === 'ArrowUp')) {
         goToPrev();
-      } else if (e.key === 'ArrowRight') {
+      } else if ((axis === 'y' && e.key === 'ArrowRight') || (axis === 'x' && e.key === 'ArrowDown')) {
         goToNext();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [goToNext, goToPrev]);
+  }, [goToNext, goToPrev, axis]);
 
-  // Click navigation: left half = prev, right half = next
+  // Click navigation: depends on axis orientation
   const handleContainerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    if (x < rect.width / 2) {
-      goToPrev();
+    
+    if (axis === 'y') {
+      // Horizontal carousel: left half = prev, right half = next
+      const x = e.clientX - rect.left;
+      if (x < rect.width / 2) {
+        goToPrev();
+      } else {
+        goToNext();
+      }
     } else {
-      goToNext();
+      // Vertical carousel: top half = prev, bottom half = next
+      const y = e.clientY - rect.top;
+      if (y < rect.height / 2) {
+        goToPrev();
+      } else {
+        goToNext();
+      }
     }
+  };
+
+  // Calculate transform based on axis
+  const getSpinnerTransform = () => {
+    const translateAxis = axis === 'y' ? 'translateZ' : 'translateZ';
+    const rotateAxis = axis === 'y' ? 'rotateY' : 'rotateX';
+    return `${translateAxis}(-${adaptiveRadius}px) ${rotateAxis}(${rotation}deg)`;
   };
 
   return (
     <div 
       ref={containerRef}
-      className={`carousel-container ${className}`}
+      className={`carousel-container ${className} carousel-container--${axis}`}
       aria-roledescription="carousel"
-      aria-label="3D rotating carousel"
+      aria-label={`3D ${axis === 'y' ? 'horizontal' : 'vertical'} rotating carousel`}
       onClick={handleContainerClick}
     >
       <div 
@@ -103,7 +128,7 @@ const Carousel: React.FC<CarouselProps> = ({
         <div 
           className="carousel-spinner"
           style={{ 
-            transform: `translateZ(-${adaptiveRadius}px) rotateY(${rotation}deg)`,
+            transform: getSpinnerTransform(),
           }}
         >
           {items.map((item, index) => {
@@ -121,6 +146,7 @@ const Carousel: React.FC<CarouselProps> = ({
                 radius={adaptiveRadius}
                 isAnimating={isAnimating}
                 onClick={() => goToItem(index)}
+                axis={axis}
               />
             );
           })}

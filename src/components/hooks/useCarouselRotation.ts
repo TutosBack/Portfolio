@@ -5,6 +5,7 @@ interface UseCarouselRotationProps {
   initialRotation?: number;
   autoRotate?: boolean;
   autoRotateSpeed?: number;
+  axis?: 'x' | 'y'; // New axis prop for rotation direction
 }
 
 export interface UseCarouselRotationReturn {
@@ -21,12 +22,14 @@ export interface UseCarouselRotationReturn {
 
 /**
  * Hook to handle carousel rotation state and animations
+ * Now supports both X and Y axis rotations
  */
 const useCarouselRotation = ({
   itemCount,
   initialRotation = 0,
   autoRotate = false,
   autoRotateSpeed = 5000,
+  axis = 'y', // Default to Y axis (horizontal rotation)
 }: UseCarouselRotationProps): UseCarouselRotationReturn => {
   const [rotation, setRotation] = useState(initialRotation);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -72,13 +75,15 @@ const useCarouselRotation = ({
     startAnimation(targetRotation);
   }, [getItemRotation, startAnimation]);
   
-  // Go to next item
+  // Go to next item - direction depends on axis
   const goToNext = useCallback(() => {
+    // For both X and Y axis, we rotate in the negative direction to go "next"
     startAnimation(rotation - itemAngle);
   }, [rotation, itemAngle, startAnimation]);
   
-  // Go to previous item
+  // Go to previous item - direction depends on axis
   const goToPrev = useCallback(() => {
+    // For both X and Y axis, we rotate in the positive direction to go "previous"
     startAnimation(rotation + itemAngle);
   }, [rotation, itemAngle, startAnimation]);
   

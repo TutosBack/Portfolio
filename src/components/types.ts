@@ -20,6 +20,7 @@ export interface CarouselProps {
   visibleCount?: number;
   onSelectItem?: (item: CarouselItem, index: number) => void;
   className?: string;
+  axis?: 'x' | 'y'; // New axis prop for rotation direction
 }
 
 // Props for each carousel item
@@ -31,6 +32,7 @@ export interface CarouselItemProps {
   isSelected: boolean;
   isAnimating: boolean;
   onClick: () => void;
+  axis?: 'x' | 'y'; // New axis prop for rotation direction
 }
 
 export interface Work {
