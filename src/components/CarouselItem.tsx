@@ -5,54 +5,48 @@ import './Carousel.css';
 const CarouselItem: React.FC<CarouselItemProps> = ({
   item,
   index,
-  rotation,
-  radius,
+  position,
   isSelected,
   isAnimating,
   onClick,
-  axis = 'y', // Default to Y axis (horizontal rotation)
+  axis = 'y',
 }) => {
-  // For selected item, always show face-on (rotation 0deg)
-  const itemAngle = isSelected ? 0 : rotation;
-  const translateZ = radius;
+  // 3D transform calculation
+  const getTransform = () => {
+    const { x, y, z, rotation } = position;
+    const translate = `translate3d(${x}px, ${y}px, ${z}px)`;
+    const rotate = axis === 'y' 
+      ? `rotateY(${rotation}deg)` 
+      : `rotateX(${rotation}deg)`;
+    
+    return `${translate} ${rotate}`;
+  };
 
-  // Scale: selected is larger, others smaller
-  const scale = isSelected ? 1.15 : 0.7;
-  // Z-index: selected on top
-  const zIndex = isSelected ? 200 : 100 - Math.abs(rotation) / 3.6;
-  // Opacity: selected fully visible, others faded
-  const opacity = isSelected ? 1 : 0.5;
-
-  // Calculate transform based on axis
-  const getItemTransform = () => {
-    const rotateAxis = axis === 'y' ? 'rotateY' : 'rotateX';
-    return `${rotateAxis}(${itemAngle}deg) translateZ(${translateZ}px) scale(${scale})`;
+  // Dynamic styles
+  const itemStyle: React.CSSProperties = {
+    transform: getTransform(),
+    opacity: isSelected ? 1 : 0.7,
+    zIndex: isSelected ? 100 : 10,
+    transition: isAnimating ? 'all 0.5s ease' : 'none',
   };
 
   return (
     <div
-      className={`carousel-item carousel-item--${axis}${isSelected ? ' selected' : ''}`}
-      style={{
-        transform: getItemTransform(),
-        opacity,
-        zIndex,
-        transition: isAnimating ? 'transform 0.5s, opacity 0.5s' : undefined,
-      }}
+      className={`carousel-item ${isSelected ? 'selected' : ''}`}
+      style={itemStyle}
       onClick={onClick}
-      role="group"
-      aria-roledescription="slide"
-      aria-label={`Slide ${index + 1} of ${item.title}`}
-      aria-selected={isSelected}
-      tabIndex={isSelected ? 0 : -1}
+      aria-label={`Item ${index + 1}: ${item.title || ''}`}
     >
       <div className="carousel-item-content">
         {item.image && (
-          <div className="carousel-item-image large">
-            <img src={item.image} alt={item.title || `Item ${index + 1}`} />
-          </div>
+          <img 
+            src={item.image} 
+            alt={item.title || `Item ${index + 1}`} 
+            className="carousel-image"
+          />
         )}
         {item.title && (
-          <h3 className="carousel-item-title light">{item.title}</h3>
+          <h3 className="carousel-title">{item.title}</h3>
         )}
       </div>
     </div>
