@@ -185,22 +185,29 @@ main {
   grid-template-columns: 1fr 1fr;
   gap: 4rem;
   align-items: start;
+  min-height: 500px;
 }
 
 .carousel-section {
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
 }
 
 /* Responsive carousel styling */
 .tech-carousel--horizontal {
-  height: 260px;
+  width: 100%;
+  height: 100%;
   background: radial-gradient(circle at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
   border-radius: 1rem;
   padding: 2rem;
 }
 
 .tech-carousel--vertical {
-  height: 400px;
+  width: 100%;
+  height: 100%;
   background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.05) 0%, transparent 70%);
   border-radius: 1rem;
   padding: 2rem;
@@ -473,11 +480,16 @@ main {
   .tech-stack-content {
     grid-template-columns: 1fr;
     gap: 3rem;
+    min-height: auto;
+  }
+  
+  .carousel-section {
+    min-height: 300px;
   }
   
   .tech-carousel--horizontal,
   .tech-carousel--vertical {
-    height: 260px;
+    height: 100%;
   }
 }
 
@@ -504,9 +516,12 @@ main {
     font-size: 2rem;
   }
   
+  .carousel-section {
+    min-height: 250px;
+  }
+  
   .tech-carousel--horizontal,
   .tech-carousel--vertical {
-    height: 200px;
     padding: 1rem;
   }
   

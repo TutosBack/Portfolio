@@ -28,25 +28,47 @@ const Carousel: React.FC<CarouselProps> = ({
       }
     };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    // Use ResizeObserver for better performance if available
+    if (containerRef.current && window.ResizeObserver) {
+      const resizeObserver = new ResizeObserver(handleResize);
+      resizeObserver.observe(containerRef.current);
+      
+      return () => resizeObserver.disconnect();
+    } else {
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }
   }, []);
 
   // Calculate adaptive radius based on container dimensions and axis
   const adaptiveRadius = React.useMemo(() => {
     if (!containerDimensions.width || !containerDimensions.height) return radius;
     
-    const baseSize = axis === 'y' 
-      ? Math.min(containerDimensions.width / 3, radius)
-      : Math.min(containerDimensions.height / 3, radius);
+    // Calculate radius based on available space
+    const containerSize = axis === 'y' 
+      ? Math.min(containerDimensions.width, containerDimensions.height)
+      : Math.min(containerDimensions.width, containerDimensions.height);
     
-    return Math.max(baseSize, 120); // Minimum radius
+    // Adaptive radius calculation
+    let calculatedRadius;
+    if (axis === 'y') {
+      // Horizontal carousel - use width as primary constraint
+      calculatedRadius = Math.min(containerDimensions.width / 4, containerDimensions.height / 3);
+    } else {
+      // Vertical carousel - use height as primary constraint
+      calculatedRadius = Math.min(containerDimensions.height / 4, containerDimensions.width / 3);
+    }
+    
+    // Ensure minimum and maximum bounds
+    return Math.max(Math.min(calculatedRadius, radius), 100);
   }, [containerDimensions, radius, axis]);
 
   // Calculate item positions in 3D space
   const getItemPosition = (index: number) => {
     const totalItems = items.length;
+    if (totalItems === 0) return { x: 0, y: 0, z: 0, rotation: 0 };
+    
     const angleStep = 360 / totalItems;
     const angle = index * angleStep;
     const radians = (angle * Math.PI) / 180;
@@ -83,11 +105,13 @@ const Carousel: React.FC<CarouselProps> = ({
   };
 
   const goToNext = () => {
+    if (items.length === 0) return;
     const nextIndex = (selectedIndex + 1) % items.length;
     goToItem(nextIndex);
   };
 
   const goToPrev = () => {
+    if (items.length === 0) return;
     const prevIndex = (selectedIndex - 1 + items.length) % items.length;
     goToItem(prevIndex);
   };
@@ -141,12 +165,25 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   };
 
-  // Calculate spinner rotation
-  const getSpinnerRotation = () => {
+  // Calculate spinner rotation and transform
+  const getSpinnerTransform = () => {
+    if (items.length === 0) return 'translateZ(0px)';
+    
     const angleStep = 360 / items.length;
     const rotation = -selectedIndex * angleStep;
-    return axis === 'y' ? `rotateY(${rotation}deg)` : `rotateX(${rotation}deg)`;
+    const rotateTransform = axis === 'y' ? `rotateY(${rotation}deg)` : `rotateX(${rotation}deg)`;
+    
+    return `translate(-50%, -50%) translateZ(-${adaptiveRadius}px) ${rotateTransform}`;
   };
+
+  // Don't render if no items
+  if (items.length === 0) {
+    return (
+      <div className={`carousel-container carousel-container--${axis} ${className}`}>
+        <div className="carousel-empty">No items to display</div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -167,7 +204,7 @@ const Carousel: React.FC<CarouselProps> = ({
         <div 
           className="carousel-spinner"
           style={{ 
-            transform: `translateZ(-${adaptiveRadius}px) ${getSpinnerRotation()}`,
+            transform: getSpinnerTransform(),
             transition: isAnimating ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
           }}
         >
