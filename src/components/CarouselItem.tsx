@@ -13,6 +13,10 @@ const CarouselItem: React.FC<CarouselItemProps> = ({
 }) => {
   // 3D transform calculation
   const getTransform = () => {
+    if (!position) {
+      return 'translate3d(0px, 0px, 0px)';
+    }
+    
     const { x, y, z, rotation } = position;
     const translate = `translate3d(${x}px, ${y}px, ${z}px)`;
     const rotate = axis === 'y' 

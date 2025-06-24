@@ -103,6 +103,34 @@ const Carousel: React.FC<CarouselProps> = ({
     }
   };
 
+  // Calculate position for each item
+  const calculateItemPosition = (index: number) => {
+    const anglePerItem = 360 / items.length;
+    const itemAngle = index * anglePerItem;
+    const radians = (itemAngle * Math.PI) / 180;
+    
+    let x = 0, y = 0, z = 0;
+    
+    if (axis === 'y') {
+      // Horizontal rotation around Y axis
+      x = Math.sin(radians) * adaptiveRadius;
+      z = Math.cos(radians) * adaptiveRadius;
+      y = 0;
+    } else {
+      // Vertical rotation around X axis
+      x = 0;
+      y = -Math.sin(radians) * adaptiveRadius;
+      z = Math.cos(radians) * adaptiveRadius;
+    }
+    
+    return {
+      x,
+      y,
+      z,
+      rotation: itemAngle
+    };
+  };
+
   // Calculate transform based on axis
   const getSpinnerTransform = () => {
     const translateAxis = axis === 'y' ? 'translateZ' : 'translateZ';
@@ -132,18 +160,15 @@ const Carousel: React.FC<CarouselProps> = ({
           }}
         >
           {items.map((item, index) => {
-            // Calculate the angle so the selected item is always at 0deg
-            const relativeIndex = ((index - selectedItemIndex!) + items.length) % items.length;
-            const itemAngle = relativeIndex * (360 / items.length);
+            const position = calculateItemPosition(index);
             const isSelected = index === selectedItemIndex;
             return (
               <CarouselItem
                 key={index}
                 item={item}
                 index={index}
+                position={position}
                 isSelected={isSelected}
-                rotation={itemAngle}
-                radius={adaptiveRadius}
                 isAnimating={isAnimating}
                 onClick={() => goToItem(index)}
                 axis={axis}
@@ -155,4 +180,5 @@ const Carousel: React.FC<CarouselProps> = ({
     </div>
   );
 };
-export default Carousel; 
+
+export default Carousel;
