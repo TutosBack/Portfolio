@@ -80,7 +80,7 @@ const TechStackCarousel: React.FC<TechStackCarouselProps> = ({ items }) => {
         <div className="carousel-section">
           <Carousel 
             items={items}
-            radius={isLargeScreen ? 250 : 140}
+            radius={isLargeScreen ? 200 : 140}
             axis={isLargeScreen ? 'x' : 'y'}
             autoRotate={true}
             autoRotateSpeed={4000}
